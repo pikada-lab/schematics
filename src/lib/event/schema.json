@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "SchematicsCiaEvent",
+  "title": "Cia event Options Schema",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the event.",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      },
+      "x-prompt": "What name would you like to use for the event?"
+    },
+    "path": {
+      "type": "string",
+      "format": "path",
+      "description": "The path to create the event."
+    },
+    "language": {
+      "type": "string",
+      "description": "Cia event language (ts/js)."
+    },
+    "sourceRoot": {
+      "type": "string",
+      "description": "Cia event source root directory."
+    },
+    "skipImport": {
+      "type": "boolean",
+      "description": "Flag to skip the module import.",
+      "default": false
+    },
+    "module": {
+      "type": "string",
+      "description": "Allows specification of the declaring module."
+    },
+    "flat": {
+      "type": "boolean",
+      "default": false,
+      "description": "Flag to indicate if a directory is created."
+    },
+    "spec": {
+      "type": "boolean",
+      "default": true,
+      "description": "Specifies if a spec file is generated."
+    },
+    "specFileSuffix": {
+      "type": "string",
+      "default": "spec",
+      "description": "Specifies the file suffix of spec files."
+    }
+  },
+  "required": ["name"]
+}

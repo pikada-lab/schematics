@@ -117,6 +117,12 @@
       "description": "Create a Nest resource.",
       "schema": "./lib/resource/schema.json",
       "aliases": ["res"]
+    },
+    "event": {
+      "factory": "./lib/event/event.factory#main",
+      "description": "Create a Cia event.",
+      "schema": "./lib/event/schema.json",
+      "aliases": ["e"]
     }
   }
 }

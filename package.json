@@ -1,5 +1,5 @@
 {
-  "name": "@nestjs/schematics",
+  "name": "@pikada-lab/schematics",
   "version": "10.0.1",
   "description": "Nest - modern, fast, powerful node.js web framework (@schematics)",
   "main": "dist/index.js",
@@ -28,7 +28,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nestjs/schematics.git"
+    "url": "git+https://github.com/pikada-lab/schematics.git"
   },
   "contributors": [
     "ThomRick",
@@ -37,9 +37,9 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/nestjs/schematics/issues"
+    "url": "https://github.com/pikada-lab/schematics/issues"
   },
-  "homepage": "https://github.com/nestjs/schematics#readme",
+  "homepage": "https://github.com/pikada-lab/schematics#readme",
   "dependencies": {
     "@angular-devkit/core": "16.1.1",
     "@angular-devkit/schematics": "16.1.1",
