@@ -18,9 +18,13 @@
       "format": "path",
       "description": "The path to create the event."
     },
-    "language": {
+    "context": {
       "type": "string",
-      "description": "Cia event language (ts/js)."
+      "description": "The bounded context."
+    },
+    "aggregate": {
+      "type": "string",
+      "description": "The event's aggregate name."
     },
     "sourceRoot": {
       "type": "string",
@@ -35,11 +39,6 @@
       "type": "string",
       "description": "Allows specification of the declaring module."
     },
-    "flat": {
-      "type": "boolean",
-      "default": false,
-      "description": "Flag to indicate if a directory is created."
-    },
     "spec": {
       "type": "boolean",
       "default": true,
@@ -51,5 +50,5 @@
       "description": "Specifies the file suffix of spec files."
     }
   },
-  "required": ["name"]
+  "required": ["name", "context", "aggregate"]
 }

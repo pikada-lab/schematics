@@ -16,14 +16,15 @@ import {
 import { normalizeToKebabOrSnakeCase } from '../../utils/formatting';
 import { Location, NameParser } from '../../utils/name.parser';
 import { mergeSourceRoot } from '../../utils/source-root.helpers';
-import { DEFAULT_LANGUAGE } from '../defaults';
 import { EventOptions } from './event.schema';
 
 const ELEMENT_METADATA = 'events';
 const ELEMENT_TYPE = 'event';
 
 export function main(options: EventOptions): Rule {
+
   options = transform(options);
+  console.log('target', options);
   return (tree: Tree, context: SchematicContext) => {
     return branchAndMerge(
       chain([
@@ -43,29 +44,33 @@ function transform(source: EventOptions): EventOptions {
   const location: Location = new NameParser().parse(target);
   target.name = normalizeToKebabOrSnakeCase(location.name);
   target.path = normalizeToKebabOrSnakeCase(location.path);
-  target.language =
-    target.language !== undefined ? target.language : DEFAULT_LANGUAGE;
+
+  target.context = normalizeToKebabOrSnakeCase(source.context);
+  target.aggregate = normalizeToKebabOrSnakeCase(source.aggregate);
 
   target.specFileSuffix = normalizeToKebabOrSnakeCase(
     source.specFileSuffix || 'spec',
   );
 
-  target.path = target.flat
-    ? target.path
-    : join(target.path as Path, target.name);
+  target.path = join(
+        target.path as Path,
+        '/context',
+        target.context,
+        target.aggregate,
+        'events'
+      );
   return target;
 }
 
 function generate(options: EventOptions) {
   return (context: SchematicContext) =>
-    apply(url(join('./files' as Path, options.language)), [
-      options.spec 
-        ? noop() 
+    apply(url('./files' as Path), [
+      options.spec
+        ? noop()
         : filter((path) => {
-            const languageExtension = options.language || 'ts';
-            const suffix = `.__specFileSuffix__.${languageExtension}`;
-            return !path.endsWith(suffix)
-        }),
+            const suffix = `.__specFileSuffix__.ts`;
+            return !path.endsWith(suffix);
+          }),
       template({
         ...strings,
         ...options,

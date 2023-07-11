@@ -8,15 +8,29 @@ import { ApplicationOptions } from '../application/application.schema';
 import { ModuleOptions } from '../module/module.schema';
 import { EventOptions } from './event.schema';
 
+const eventClass = `import { DomainEvent } from '@core/domain-event';
+import { UUID } from 'crypto';
+
+export class UserEvent<DATA> extends DomainEvent<DATA> {
+  static CreateDomainEvent<DATA>(
+    data: DATA,
+    entity_id: UUID,
+    event_type: string,
+  ): UserEvent<DATA> {
+    return super.CreateBaseDomainEvent(data, event_type, 'User', entity_id);
+  }
+}
+`
+
 const fooClass = `import { UUID } from 'crypto';
-import { AggregateEvent } from './event';
+import { UserEvent } from './event';
 import { DomainEvent } from '@core/domain-event';
 
 export interface FooDS {
     // declare here
 }
 
-export class Foo extends AggregateEvent<FooDS> {
+export class Foo extends UserEvent<FooDS> {
   static Create(details: FooDS, id: UUID): Foo {
     return super.CreateDomainEvent(details, id, 'Foo');
   }
@@ -26,14 +40,14 @@ DomainEvent.CONSTRUCTORS.set('Foo', Foo);
 `;
 
 const fooBarClass = `import { UUID } from 'crypto';
-import { AggregateEvent } from './event';
+import { UserEvent } from './event';
 import { DomainEvent } from '@core/domain-event';
 
 export interface FooBarDS {
     // declare here
 }
 
-export class FooBar extends AggregateEvent<FooBarDS> {
+export class FooBar extends UserEvent<FooBarDS> {
   static Create(details: FooBarDS, id: UUID): FooBar {
     return super.CreateDomainEvent(details, id, 'FooBar');
   }
@@ -49,9 +63,10 @@ describe('Event Factory', () => {
   it('should manage name only', async () => {
     const options: EventOptions = {
       name: 'foo',
+      context: 'identity',
+      aggregate: 'user',
       skipImport: true,
       spec: false,
-      flat: false,
     };
     const tree: UnitTestTree = await runner
       .runSchematicAsync('event', options)
@@ -59,16 +74,18 @@ describe('Event Factory', () => {
     const files: string[] = tree.files;
 
     expect(
-      files.find((filename) => filename === '/foo/foo.event.ts'),
+      files.find((filename) => filename === '/context/identity/user/events/foo.event.ts'),
     ).toBeDefined();
     expect(
-      files.find((filename) => filename === '/foo/foo.event.spec.ts'),
+      files.find((filename) => filename === '/context/identity/user/events/foo.event.spec.ts'),
     ).not.toBeDefined();
-    expect(tree.readContent('/foo/foo.event.ts')).toEqual(fooClass);
+    expect(tree.readContent('/context/identity/user/events/foo.event.ts')).toEqual(fooClass);
   });
   it('should manage name has a path', async () => {
     const options: EventOptions = {
       name: 'bar/foo',
+      context: 'identity',
+      aggregate: 'user',
       skipImport: true,
     };
     const tree: UnitTestTree = await runner
@@ -76,17 +93,23 @@ describe('Event Factory', () => {
       .toPromise();
     const files: string[] = tree.files;
     expect(
-      files.find((filename) => filename === '/bar/foo/foo.event.ts'),
+      files.find((filename) => filename === '/bar/context/identity/user/events/foo.event.ts'),
     ).toBeDefined();
     expect(
-      files.find((filename) => filename === '/bar/foo/foo.event.spec.ts'),
+      files.find((filename) => filename === '/bar/context/identity/user/events/foo.event.spec.ts'),
     ).toBeDefined();
-    expect(tree.readContent('/bar/foo/foo.event.ts')).toEqual(fooClass);
+    expect(
+      files.find((filename) => filename === '/bar/context/identity/user/events/event.ts'),
+    ).toBeDefined();
+    expect(tree.readContent('/bar/context/identity/user/events/foo.event.ts')).toEqual(fooClass);
+    expect(tree.readContent('/bar/context/identity/user/events/event.ts')).toEqual(eventClass);
   });
   it('should manage name and path', async () => {
     const options: EventOptions = {
       name: 'foo',
       path: 'bar',
+      context: 'identity',
+      aggregate: 'user',
       skipImport: true,
     };
     const tree: UnitTestTree = await runner
@@ -94,16 +117,18 @@ describe('Event Factory', () => {
       .toPromise();
     const files: string[] = tree.files;
     expect(
-      files.find((filename) => filename === '/bar/foo/foo.event.ts'),
+      files.find((filename) => filename === '/bar/context/identity/user/events/foo.event.ts'),
     ).toBeDefined();
     expect(
-      files.find((filename) => filename === '/bar/foo/foo.event.spec.ts'),
+      files.find((filename) => filename === '/bar/context/identity/user/events/foo.event.spec.ts'),
     ).toBeDefined();
-    expect(tree.readContent('/bar/foo/foo.event.ts')).toEqual(fooClass);
+    expect(tree.readContent('/bar/context/identity/user/events/foo.event.ts')).toEqual(fooClass);
   });
   it('should manage name to normalize', async () => {
     const options: EventOptions = {
       name: 'fooBar',
+      context: 'identity',
+      aggregate: 'user',
       skipImport: true,
     };
     const tree: UnitTestTree = await runner
@@ -111,18 +136,20 @@ describe('Event Factory', () => {
       .toPromise();
     const files: string[] = tree.files;
     expect(
-      files.find((filename) => filename === '/foo-bar/foo-bar.event.ts'),
+      files.find((filename) => filename === '/context/identity/user/events/foo-bar.event.ts'),
     ).toBeDefined();
     expect(
       files.find(
-        (filename) => filename === '/foo-bar/foo-bar.event.spec.ts',
+        (filename) => filename === '/context/identity/user/events/foo-bar.event.spec.ts',
       ),
     ).toBeDefined();
-    expect(tree.readContent('/foo-bar/foo-bar.event.ts')).toEqual(fooBarClass);
+    expect(tree.readContent('/context/identity/user/events/foo-bar.event.ts')).toEqual(fooBarClass);
   });
   it('manage keep underscores in path', async () => {
     const options: EventOptions = {
       name: '_bar/foo',
+      context: 'identity',
+      aggregate: 'user',
       skipImport: true,
     };
     const tree: UnitTestTree = await runner
@@ -130,16 +157,18 @@ describe('Event Factory', () => {
       .toPromise();
     const files: string[] = tree.files;
     expect(
-      files.find((filename) => filename === '/_bar/foo/foo.event.ts'),
+      files.find((filename) => filename === '/_bar/context/identity/user/events/foo.event.ts'),
     ).toBeDefined();
     expect(
-      files.find((filename) => filename === '/_bar/foo/foo.event.spec.ts'),
+      files.find((filename) => filename === '/_bar/context/identity/user/events/foo.event.spec.ts'),
     ).toBeDefined();
-    expect(tree.readContent('/_bar/foo/foo.event.ts')).toEqual(fooClass);
+    expect(tree.readContent('/_bar/context/identity/user/events/foo.event.ts')).toEqual(fooClass);
   });
   it("should keep underscores in event's path and file name", async () => {
     const options: EventOptions = {
       name: 'barBaz/foo',
+      context: 'identity',
+      aggregate: 'user',
       skipImport: true,
     };
     const tree: UnitTestTree = await runner
@@ -147,20 +176,21 @@ describe('Event Factory', () => {
       .toPromise();
     const files: string[] = tree.files;
     expect(
-      files.find((filename) => filename === '/bar-baz/foo/foo.event.ts'),
+      files.find((filename) => filename === '/bar-baz/context/identity/user/events/foo.event.ts'),
     ).toBeDefined();
     expect(
       files.find(
-        (filename) => filename === '/bar-baz/foo/foo.event.spec.ts',
+        (filename) => filename === '/bar-baz/context/identity/user/events/foo.event.spec.ts',
       ),
     ).toBeDefined();
-    expect(tree.readContent('/bar-baz/foo/foo.event.ts')).toEqual(fooClass);
+    expect(tree.readContent('/bar-baz/context/identity/user/events/foo.event.ts')).toEqual(fooClass);
   }); 
   it('should create a spec file', async () => {
     const options: EventOptions = {
       name: 'foo',
+      context: 'identity',
+      aggregate: 'user',
       spec: true,
-      flat: true,
     };
     const tree: UnitTestTree = await runner
       .runSchematicAsync('event', options)
@@ -168,15 +198,16 @@ describe('Event Factory', () => {
     const files: string[] = tree.files;
 
     expect(
-      files.find((filename) => filename === '/foo.event.spec.ts'),
+      files.find((filename) => filename === '/context/identity/user/events/foo.event.spec.ts'),
     ).not.toBeUndefined();
   });
   it('should create a spec file with custom file suffix', async () => {
     const options: EventOptions = {
       name: 'foo',
+      context: 'identity',
+      aggregate: 'user',
       spec: true,
       specFileSuffix: 'test',
-      flat: true,
     };
     const tree: UnitTestTree = await runner
       .runSchematicAsync('event', options)
@@ -184,10 +215,10 @@ describe('Event Factory', () => {
     const files: string[] = tree.files;
 
     expect(
-      files.find((filename) => filename === '/foo.event.spec.ts'),
+      files.find((filename) => filename === '/context/identity/user/events/foo.event.spec.ts'),
     ).toBeUndefined();
     expect(
-      files.find((filename) => filename === '/foo.event.test.ts'),
+      files.find((filename) => filename === '/context/identity/user/events/foo.event.test.ts'),
     ).not.toBeUndefined();
   });
 });
