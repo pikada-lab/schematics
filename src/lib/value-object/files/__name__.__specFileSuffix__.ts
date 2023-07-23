@@ -1,4 +1,4 @@
-import { <%= classify(name) %> } from './<%= name %>.value-object';
+import { <%= classify(name) %> } from './<%= name %>';
 
 describe('<%= classify(name) %>', () => {
   it('should be defined', () => {

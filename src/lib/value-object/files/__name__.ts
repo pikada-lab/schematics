@@ -8,7 +8,7 @@ export class <%= classify(name) %> extends ValueObject<string> {
   [nameType]: void; // Отмена структурной типизации
 
   public static Create(value: string): Resilt<<%= classify(name) %>> {
-    if (typeof data !== 'string') {
+    if (typeof value !== 'string') {
       return Result.failure('Значение должно быть строкой'); // Задайте ограничения
     }
     value = value.trim(); // Задайте трансформации
