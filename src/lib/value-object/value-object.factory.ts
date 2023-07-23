@@ -16,12 +16,12 @@ import {
 import { normalizeToKebabOrSnakeCase } from '../../utils/formatting';
 import { Location, NameParser } from '../../utils/name.parser';
 import { mergeSourceRoot } from '../../utils/source-root.helpers';
-import { EventOptions } from './event.schema';
+import { ValueObjectOptions } from './value-object.schema';
 
 const ELEMENT_METADATA = 'events';
 const ELEMENT_TYPE = 'event';
 
-export function main(options: EventOptions): Rule {
+export function main(options: ValueObjectOptions): Rule {
   options = transform(options);
   return (tree: Tree, context: SchematicContext) => {
     return branchAndMerge(
@@ -34,8 +34,8 @@ export function main(options: EventOptions): Rule {
   };
 }
 
-function transform(source: EventOptions): EventOptions {
-  const target: EventOptions = Object.assign({}, source);
+function transform(source: ValueObjectOptions): ValueObjectOptions {
+  const target: ValueObjectOptions = Object.assign({}, source);
   target.metadata = ELEMENT_METADATA;
   target.type = ELEMENT_TYPE;
 
@@ -51,11 +51,11 @@ function transform(source: EventOptions): EventOptions {
     source.specFileSuffix || 'spec',
   );
 
-  target.path = join('context' as Path, target.path as Path, 'events');
+  target.path = join('context' as Path, target.path as Path, 'value-object');
   return target;
 }
 
-function generate(options: EventOptions) {
+function generate(options: ValueObjectOptions) {
   return (context: SchematicContext) =>
     apply(url('./files' as Path), [
       options.spec
