@@ -1,13 +1,14 @@
 import { Result } from '@core/result';
 import { ValueObject } from '@core/value-object';
 
+// Отмена структурной типизации
 declare const nameType: unique symbol;
 
 export class <%= classify(name) %> extends ValueObject<string> {
   
-  [nameType]: void; // Отмена структурной типизации
+  [nameType]: void;
 
-  public static Create(value: string): Resilt<<%= classify(name) %>> {
+  public static Create(value: any): Result<<%= classify(name) %>> {
     if (typeof value !== 'string') {
       return Result.failure('Значение должно быть строкой'); // Задайте ограничения
     }

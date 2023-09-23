@@ -1,4 +1,3 @@
-import { normalize } from '@angular-devkit/core';
 import {
   SchematicTestRunner,
   UnitTestTree,
@@ -9,14 +8,15 @@ import { ValueObjectOptions } from './value-object.schema';
 const valueObject = `import { Result } from '@core/result';
 import { ValueObject } from '@core/value-object';
 
+// Отмена структурной типизации
 declare const nameType: unique symbol;
 
 export class Foo extends ValueObject<string> {
   
-  [nameType]: void; // Отмена структурной типизации
+  [nameType]: void;
 
-  public static Create(value: string): Resilt<Foo> {
-    if (typeof data !== 'string') {
+  public static Create(value: any): Result<Foo> {
+    if (typeof value !== 'string') {
       return Result.failure('Значение должно быть строкой'); // Задайте ограничения
     }
     value = value.trim(); // Задайте трансформации
@@ -25,19 +25,30 @@ export class Foo extends ValueObject<string> {
 }
 `;
 
-const valueObjectSpec = `import { Foo } from './foo.value-object';
+const valueObjectSpec = `import { Foo } from './foo';
 
 describe('Foo', () => {
   it('should be defined', () => {
     // Arrange
-    const dao: string = "string"; // Ваше значение
+    const value: string = "string";
 
     // Act
-    const sut = Foo.Create(dao);
+    const sut = Foo.Create(value);
 
     // Assert
     expect(sut.isFailure).toBeFalsy();
     expect(sut.value).toBeInstanceOf(Foo);
+  });
+  it('should be failure', () => {
+    // Arrange
+    const value: string = "T_T";
+
+    // Act
+    const sut = Foo.Create(value);
+
+    // Assert
+    expect(sut.error).toEqual('');
+    expect(sut.isFailure).toBeTruthy();
   });
 });
 `;

@@ -12,8 +12,14 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import { normalizeToKebabOrSnakeCase } from '../../utils/formatting';
-import { Location, NameParser } from '../../utils/name.parser';
-import { mergeSourceRoot } from '../../utils/source-root.helpers';
+import {
+  mergeSourceRoot,
+  Location,
+  NameParser,
+  AggregateFinder,
+  AggregateDeclarator,
+  DeclarationOptions,
+} from '../../utils';
 import { CommandOptions } from './command.schema';
 
 const ELEMENT_METADATA = 'events';
@@ -23,7 +29,11 @@ export function main(options: CommandOptions): Rule {
   options = transform(options);
   return (tree: Tree, context: SchematicContext) => {
     return branchAndMerge(
-      chain([mergeSourceRoot(options), mergeWith(generate(options))]),
+      chain([
+        mergeSourceRoot(options),
+        mergeWith(generate(options)),
+        addDeclarationToModule(options),
+      ]),
     )(tree, context);
   };
 }
@@ -52,4 +62,26 @@ function generate(options: CommandOptions) {
       }),
       move(options.path),
     ])(context);
+}
+
+function addDeclarationToModule(options: CommandOptions): Rule {
+  return (tree: Tree) => {
+    if (options.skipImport !== undefined && options.skipImport) {
+      return tree;
+    }
+    options.module = new AggregateFinder(tree).find({
+      aggregate: options.aggregate,
+      path: options.path as Path,
+    });
+    if (!options.module) {
+      return tree;
+    }
+    const content = tree.read(options.module).toString();
+    const declarator: AggregateDeclarator = new AggregateDeclarator();
+    tree.overwrite(
+      options.module,
+      declarator.declareCommand(content, options as DeclarationOptions),
+    );
+    return tree;
+  };
 }
