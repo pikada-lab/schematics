@@ -96,7 +96,7 @@ function addDeclarationToAggregate(options: CommandOptions): Rule {
     const declarator: AggregateDeclarator = new AggregateDeclarator();
     tree.overwrite(
       options.module,
-      declarator.declareCommand(content, options as DeclarationOptions),
+      declarator.declareEvent(content, options as DeclarationOptions),
     );
     return tree;
   };
