@@ -93,7 +93,7 @@ export class MetadataManager {
     const position = node.value.end;
     this.content = [
       this.content.substring(0, position),
-      `\n    private process${symbol}(command: ${symbol}): Result<${strings.classify(staticOptions.name)}Event[]> {\n    \n    // Business logic\n    return Result.success([]);\n}\n`,
+      `\n\n  private process${symbol}(command: ${symbol}): Result<${strings.classify(staticOptions.name)}Event<unknown>[]> {\n    // Business logic\n    return Result.success([]);\n  }`,
       this.content.substring(position)
     ].join('');
     return Result.success(this.content);

@@ -2,9 +2,9 @@ import { join, Path, strings } from '@angular-devkit/core';
 import {
   apply,
   branchAndMerge,
-  chain,
+  chain, filter,
   mergeWith,
-  move,
+  move, noop,
   Rule,
   SchematicContext,
   template,
@@ -56,6 +56,12 @@ function transform(source: CommandOptions): CommandOptions {
 function generate(options: CommandOptions) {
   return (context: SchematicContext) =>
     apply(url('./files' as Path), [
+      options.spec
+        ? noop()
+        : filter((path) => {
+          const suffix = `.__specFileSuffix__.ts`;
+          return !path.endsWith(suffix);
+        }),
       template({
         ...strings,
         ...options,

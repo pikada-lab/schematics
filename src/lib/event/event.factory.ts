@@ -14,8 +14,7 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import { normalizeToKebabOrSnakeCase } from '../../utils/formatting';
-import { Location, NameParser } from '../../utils/name.parser';
-import { mergeSourceRoot } from '../../utils/source-root.helpers';
+import { Location, NameParser, mergeSourceRoot } from '../../utils';
 import { EventOptions } from './event.schema';
 
 const ELEMENT_METADATA = 'events';
