@@ -5,6 +5,7 @@ export interface CommandOptions {
    * The name of the event.
    */
   name: string;
+  className?: string;
 
   /**
    * The name of the event's aggregate.

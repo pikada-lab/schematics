@@ -22,8 +22,8 @@ import {
 } from '../../utils';
 import { CommandOptions } from './command.schema';
 
-const ELEMENT_METADATA = 'events';
-const ELEMENT_TYPE = 'event';
+const ELEMENT_METADATA = 'command';
+const ELEMENT_TYPE = 'command';
 
 export function main(options: CommandOptions): Rule {
   options = transform(options);
@@ -76,6 +76,7 @@ function addDeclarationToModule(options: CommandOptions): Rule {
     if (!options.module) {
       return tree;
     }
+    options.className = strings.classify(options.name);
     const content = tree.read(options.module).toString();
     const declarator: AggregateDeclarator = new AggregateDeclarator();
     tree.overwrite(
