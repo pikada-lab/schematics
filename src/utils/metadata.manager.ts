@@ -17,6 +17,7 @@ import {
 } from 'typescript';
 import { DeclarationOptions } from './module.declarator';
 import { Result } from './result';
+import { strings } from '@angular-devkit/core';
 
 export class MetadataManager {
   constructor(private content: string) {}
@@ -78,7 +79,7 @@ export class MetadataManager {
     this.content = [
       this.content.substring(0, position),
       (options?.prevStart ? '\n    ' : ''),
-      `if (command instanceOf ${symbol}) {\n      return this.process${symbol}(command);\n    }\n  `,
+      `if (command instanceof ${symbol}) {\n      return this.process${symbol}(command);\n    }\n  `,
       (options?.nextEnd ? '' : '  '),
       this.content.substring(position)
     ].join('');
@@ -92,7 +93,7 @@ export class MetadataManager {
     const position = node.value.end;
     this.content = [
       this.content.substring(0, position),
-      `\n    private process${symbol}(command: ${symbol}): Result<${staticOptions.name}Event[]> {\n    \n    // Business logic\n    return Result.success([]);\n}\n`,
+      `\n    private process${symbol}(command: ${symbol}): Result<${strings.classify(staticOptions.name)}Event[]> {\n    \n    // Business logic\n    return Result.success([]);\n}\n`,
       this.content.substring(position)
     ].join('');
     return Result.success(this.content);

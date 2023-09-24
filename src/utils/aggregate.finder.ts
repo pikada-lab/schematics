@@ -12,7 +12,7 @@ export class AggregateFinder {
   }
 
   public find(options: AggregateFindOptions): Path | null {
-    const generatedDirectoryPath: Path = join('context' as Path, options.path);
+    const generatedDirectoryPath: Path = join(options.path, '..');
     const generatedDirectory: DirEntry = this.tree.getDir(
       generatedDirectoryPath,
     );
