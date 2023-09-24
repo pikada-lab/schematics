@@ -32,6 +32,13 @@ export class AggregateDeclarator {
     return content;
   }
 
+  public declareEvent(content: string, options: DeclarationOptions): string {
+    options = this.computeSymbol(options);
+    content = this.imports.declare(content, options);
+    content = this.metadata.declareEvent(content, options);
+    return content;
+  }
+
   private computeSymbol(options: DeclarationOptions): DeclarationOptions {
     const target = Object.assign({}, options);
     if (options.className) {

@@ -29,6 +29,43 @@ export class MetadataManager {
   /**
    * Добавляет в метод процесс класса агрегата необходимые вызовы метода
    */
+  public insertEventToApply(
+    metadata: string,
+    symbol: string,
+  ): Result<string> {
+    const source: SourceFile = createSourceFile(
+      'filename.ts',
+      this.content,
+      ScriptTarget.ES2017,
+    );
+    const members = this.getClassDeclaration(source);
+    const methodResult = this.getMethod(source, members, 'apply');
+    const blockResult = this.getContextBlock(source, methodResult);
+    const resultCheck = this.checkHasClass(source, blockResult, symbol);
+    const ifStatement = this.getIfStatement(source, resultCheck);
+    return this.setStatementIfToApply(source, ifStatement, symbol)
+  }
+
+
+  public insertApplyFunction(
+    metadata: string,
+    symbol: string,
+  ): Result<string> {
+    const source: SourceFile = createSourceFile(
+      'filename.ts',
+      this.content,
+      ScriptTarget.ES2017,
+    );
+    const members = this.getClassDeclaration(source);
+    const methodResult = this.getMethod(source, members, 'apply');
+    const resultCheck = this.checkHasMethod(source, methodResult, members, 'apply' + symbol);
+    return this.setMethodApply(source, resultCheck, symbol)
+  }
+
+
+  /**
+   * Добавляет в метод процесс класса агрегата необходимые вызовы метода
+   */
   public insertCommandToProcess(
     metadata: string,
     symbol: string,
@@ -43,7 +80,7 @@ export class MetadataManager {
     const blockResult = this.getContextBlock(source, methodResult);
     const resultCheck = this.checkHasClass(source, blockResult, symbol);
     const ifStatement = this.getIfStatement(source, resultCheck);
-    return this.setStatementIf(source, ifStatement, symbol)
+    return this.setStatementIfToProcess(source, ifStatement, symbol)
   }
 
   public insertProcessFunction(
@@ -63,7 +100,7 @@ export class MetadataManager {
   }
 
 
-  private setStatementIf(source: SourceFile, node: Result<IfStatement[]>, symbol: string): Result<string> {
+  private setStatementIfToProcess(source: SourceFile, node: Result<IfStatement[]>, symbol: string): Result<string> {
     if (node.isFailure) {
       return Result.reFailure(node);
     }
@@ -86,6 +123,29 @@ export class MetadataManager {
     return Result.success(this.content);
   }
 
+  private setStatementIfToApply(source: SourceFile, node: Result<IfStatement[]>, symbol: string): Result<string> {
+    if (node.isFailure) {
+      return Result.reFailure(node);
+    }
+    const options = {
+      prevStart: false,
+      nextEnd: false,
+    }
+    if (node.value.length === 0) {
+      options.prevStart = true;
+      options.nextEnd = true;
+    }
+    const position = node.value[0].getStart(source);
+    this.content = [
+      this.content.substring(0, position),
+      (options?.prevStart ? '\n    ' : ''),
+      `\n    if (event instanceof ${symbol}) {\n      this.apply${symbol}(event);\n    }\n  `,
+      (options?.nextEnd ? '' : '  '),
+      this.content.substring(position)
+    ].join('');
+    return Result.success(this.content);
+  }
+
   private setMethodProcess(source: SourceFile, node: Result<ClassElement>, symbol: string,  staticOptions?: DeclarationOptions['staticOptions']): Result<string> {
     if (node.isFailure) {
       return Result.reFailure(node);
@@ -94,6 +154,19 @@ export class MetadataManager {
     this.content = [
       this.content.substring(0, position),
       `\n\n  private process${symbol}(command: ${symbol}): Result<${strings.classify(staticOptions.name)}Event<unknown>[]> {\n    // Business logic\n    return Result.success([]);\n  }`,
+      this.content.substring(position)
+    ].join('');
+    return Result.success(this.content);
+  }
+
+  private setMethodApply(source: SourceFile, node: Result<ClassElement>, symbol: string): Result<string> {
+    if (node.isFailure) {
+      return Result.reFailure(node);
+    }
+    const position = node.value.end;
+    this.content = [
+      this.content.substring(0, position),
+      `\n\n  private apply${symbol}(event: ${symbol}): void {\n    // Change model\n  }`,
       this.content.substring(position)
     ].join('');
     return Result.success(this.content);

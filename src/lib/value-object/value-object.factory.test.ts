@@ -12,7 +12,6 @@ import { ValueObject } from '@core/value-object';
 declare const nameType: unique symbol;
 
 export class Foo extends ValueObject<string> {
-  
   [nameType]: void;
 
   public static Create(value: any): Result<Foo> {

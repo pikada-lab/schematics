@@ -32,7 +32,7 @@ export function main(options: CommandOptions): Rule {
       chain([
         mergeSourceRoot(options),
         mergeWith(generate(options)),
-        addDeclarationToModule(options),
+        addDeclarationToAggregate(options),
       ]),
     )(tree, context);
   };
@@ -70,7 +70,7 @@ function generate(options: CommandOptions) {
     ])(context);
 }
 
-function addDeclarationToModule(options: CommandOptions): Rule {
+function addDeclarationToAggregate(options: CommandOptions): Rule {
   return (tree: Tree) => {
     if (options.skipImport !== undefined && options.skipImport) {
       return tree;

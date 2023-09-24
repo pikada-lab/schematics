@@ -5,7 +5,6 @@ import { ValueObject } from '@core/value-object';
 declare const nameType: unique symbol;
 
 export class <%= classify(name) %> extends ValueObject<string> {
-  
   [nameType]: void;
 
   public static Create(value: any): Result<<%= classify(name) %>> {
