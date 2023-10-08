@@ -46,6 +46,7 @@ function transform(source: CommandOptions): CommandOptions {
   const location: Location = new NameParser().parse(target);
   target.name = normalizeToKebabOrSnakeCase(location.name);
   target.path = normalizeToKebabOrSnakeCase(location.path);
+
   target.aggregate = normalizeToKebabOrSnakeCase(
     target.path.split('/').reverse()[0],
   );

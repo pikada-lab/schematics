@@ -24,6 +24,6 @@ describe('<%= classify(aggregate) %> - command: <%= classify(name) %>', () => {
     expect(sut.getVersion()).toBe(1);
     expect(Array.isArray(result<%= classify(name) %>.value)).toBeTruthy();
     // expect(result<%= classify(name) %>.value).toHaveLength(1);
-    // expect(result<%= classify(name) %>.value[0]).toBeInstanceOf(PUSH_YOUR_EVENT_INSTANCE)
+    // expect(result<%= classify(name) %>.value[0]).toBeInstanceOf(PUSH_YOUR_EVENT_INSTANCE);
   });
 });

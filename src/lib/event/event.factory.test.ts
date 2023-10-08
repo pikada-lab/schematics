@@ -1,4 +1,3 @@
-import { normalize } from '@angular-devkit/core';
 import {
   SchematicTestRunner,
   UnitTestTree,

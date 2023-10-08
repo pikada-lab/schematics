@@ -46,7 +46,7 @@ describe('Foo', () => {
     const sut = Foo.Create(value);
 
     // Assert
-    expect(sut.error).toEqual('');
+    expect(sut.error).not.toEqual('');
     expect(sut.isFailure).toBeTruthy();
   });
 });
